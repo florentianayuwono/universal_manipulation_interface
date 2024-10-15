@@ -21,11 +21,12 @@ from umi.common.timecode_util import mp4_get_start_datetime
 @click.argument('session_dir', nargs=-1)
 def main(session_dir):
     for session in session_dir:
-        session = pathlib.Path(os.path.expanduser(session)).absolute()
+        # session = pathlib.Path(os.path.expanduser(session)).absolute()
+        session = pathlib.Path(ROOT_DIR).joinpath(session).absolute()
         # hardcode subdirs
         input_dir = session.joinpath('raw_videos')
         output_dir = session.joinpath('demos')
-        
+        print(f"Looking for videos in: {input_dir}")
         # create raw_videos if don't exist
         if not input_dir.is_dir():
             input_dir.mkdir()
@@ -39,6 +40,10 @@ def main(session_dir):
         if (not mapping_vid_path.exists()) and not(mapping_vid_path.is_symlink()):
             max_size = -1
             max_path = None
+            video_files = list(input_dir.glob('**/*.MP4')) + list(input_dir.glob('**/*.mp4'))
+
+            # Print the detected video files for debugging
+            print(f"Detected video files: {video_files}")
             for mp4_path in list(input_dir.glob('**/*.MP4')) + list(input_dir.glob('**/*.mp4')):
                 size = mp4_path.stat().st_size
                 if size > max_size:
